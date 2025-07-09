@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   StyleSheet
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Link, Href } from 'expo-router';
 import { AuthService } from '../src/services/auth.service'; // Importamos nuestro servicio
 
 // --- Explicación de las importaciones ---
@@ -83,7 +83,7 @@ const LoginScreen = () => {
           />
 
           {/* Títulos */}
-          <Text style={styles.title}>Bienvenido de Nuevo</Text>
+          <Text style={styles.title}>Bienvenido a Universitas</Text>
           <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
 
           {/* Inputs */}
@@ -124,6 +124,16 @@ const LoginScreen = () => {
               <Text style={styles.buttonText}>Iniciar Sesión</Text>
             )}
           </TouchableOpacity>
+
+          {/* Enlaces de Registro y Recuperación */}
+          <View style={styles.linksContainer}>
+            <Link href={'/forgot-password' as Href} style={styles.link}>
+              ¿Olvidaste tu contraseña?
+            </Link>
+            <Link href={'/register' as Href} style={styles.link}>
+              ¿No tienes cuenta? Regístrate
+            </Link>
+          </View>
         </ScrollView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -189,6 +199,16 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  linksContainer: {
+    marginTop: 25,
+    width: '100%',
+    alignItems: 'center',
+    gap: 15,
+  },
+  link: {
+    color: '#3B82F6', // Azul
+    fontSize: 16,
   },
 });
 

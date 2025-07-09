@@ -27,6 +27,13 @@ export default function RootLayout() {
       */}
       <Stack.Screen name="login" options={{ headerShown: false }} />
 
+      {/* Nuevas pantallas de registro y recuperación */}
+      <Stack.Screen name="register" options={{ title: 'Registro - Paso 1' }} />
+      <Stack.Screen name="register-profile" options={{ title: 'Registro - Paso 2' }} />
+      <Stack.Screen name="forgot-password" options={{ title: 'Recuperar Contraseña' }} />
+      <Stack.Screen name="verify-otp" options={{ title: 'Verificar Código' }} />
+      <Stack.Screen name="reset-password" options={{ title: 'Restablecer Contraseña' }} />
+
       {/* Las pantallas que ya existían */}
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="manual" options={{ title: 'Manual Escala' }} />

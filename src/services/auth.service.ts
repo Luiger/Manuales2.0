@@ -9,13 +9,25 @@ import * as SecureStore from 'expo-secure-store';
 // `API_URL`: La URL base de tu backend. Es una buena práctica tenerla en un
 // archivo de configuración, pero por ahora la definimos aquí.
 // Asegúrate de que el puerto coincida con el de tu backend.
-const API_URL = 'https://4cd1bc79ac2b.ngrok-free.app/api/auth'; // Ajustado al puerto 3000
+const API_URL = 'https://86854347610a.ngrok-free.app/api/auth'; // Ajustado al puerto 3000
 
-// --- Interfaz de Respuesta ---
-// Define la forma que tendrá el objeto de respuesta de nuestra función de login.
+// --- Interfaces ---
 interface AuthResponse {
   success: boolean;
   error?: string;
+  token?: string;
+}
+
+interface VerifyOtpResponse {
+  success: boolean;
+  error?: string;
+  resetToken?: string;
+}
+
+interface RegisterCredentialsResponse {
+  success: boolean;
+  error?: string;
+  tempToken?: string;
 }
 
 // --- Función de Login ---
@@ -23,25 +35,12 @@ interface AuthResponse {
 // Se añaden los tipos explícitos a los parámetros para cumplir con TypeScript.
 const login = async (email: string, password: string): Promise<AuthResponse> => {
   try {
-    // --- 1. Petición al Backend ---
-    // `axios.post`: Envía una petición POST al endpoint '/login'.
-    // El segundo argumento es el cuerpo de la petición, con el email y la contraseña.
-    const response = await axios.post(`${API_URL}/login`, {
-      email,
-      password,
-    });
-
-    // --- 2. Manejo de Respuesta Exitosa ---
-    // Si la petición fue exitosa (código 2xx), el backend nos devuelve un token.
+    const response = await axios.post(`${API_URL}/login`, { email, password });
     if (response.data && response.data.token) {
-      // `SecureStore.setItemAsync`: Guarda el token de forma segura en el dispositivo.
-      // 'userToken' es la clave con la que lo guardamos.
       await SecureStore.setItemAsync('userToken', response.data.token);
-      return { success: true };
-    } else {
-      // Si la respuesta no tiene el formato esperado.
-      return { success: false, error: 'Respuesta inesperada del servidor.' };
+      return { success: true, token: response.data.token };
     }
+    return { success: false, error: 'Respuesta inesperada del servidor.' };
   } catch (error) {
     // --- 3. Manejo de Errores ---
     // Se maneja el error de tipo `unknown` de forma segura.
@@ -64,7 +63,90 @@ const login = async (email: string, password: string): Promise<AuthResponse> => 
 };
 
 // --- Exportación ---
+// --- Función de Registro (Paso 1: Credenciales) ---
+const registerCredentials = async (email: string, password: string): Promise<RegisterCredentialsResponse> => {
+  try {
+    const response = await axios.post(`${API_URL}/register/credentials`, { email, password });
+    if (response.data && response.data.tempToken) {
+      return { success: true, tempToken: response.data.tempToken };
+    }
+    return { success: false, error: 'Respuesta inesperada del servidor.' };
+  } catch (error) {
+    let errorMessage = 'Ocurrió un error inesperado.';
+    if (axios.isAxiosError(error) && error.response) {
+      errorMessage = error.response.data.message || 'Error en la respuesta del servidor.';
+    }
+    return { success: false, error: errorMessage };
+  }
+};
+
+// --- Función de Registro (Paso 2: Perfil) ---
+const registerProfile = async (profileData: any, tempToken: string): Promise<AuthResponse> => {
+  try {
+    await axios.post(`${API_URL}/register/profile`, profileData, {
+      headers: { Authorization: `Bearer ${tempToken}` },
+    });
+    return { success: true };
+  } catch (error) {
+    let errorMessage = 'Ocurrió un error inesperado.';
+    if (axios.isAxiosError(error) && error.response) {
+      errorMessage = error.response.data.message || 'Error en la respuesta del servidor.';
+    }
+    return { success: false, error: errorMessage };
+  }
+};
+
+// --- Función para Solicitar Recuperación de Contraseña ---
+const forgotPassword = async (email: string): Promise<AuthResponse> => {
+  try {
+    await axios.post(`${API_URL}/forgot-password`, { email });
+    return { success: true };
+  } catch (error) {
+    // No devolvemos el error específico para no revelar si un email existe o no.
+    return { success: false, error: 'Si el correo existe, se ha enviado un enlace.' };
+  }
+};
+
+// --- Función para Resetear la Contraseña ---
+const resetPassword = async (password: string, resetToken: string): Promise<AuthResponse> => {
+  try {
+    await axios.post(`${API_URL}/reset-password`, { password }, {
+      headers: { Authorization: `Bearer ${resetToken}` },
+    });
+    return { success: true };
+  } catch (error) {
+    let errorMessage = 'Ocurrió un error inesperado.';
+    if (axios.isAxiosError(error) && error.response) {
+      errorMessage = error.response.data.message || 'Error en la respuesta del servidor.';
+    }
+    return { success: false, error: errorMessage };
+  }
+};
+
+
+// --- Función para Verificar el Código OTP ---
+const verifyOtp = async (email: string, otp: string): Promise<VerifyOtpResponse> => {
+  try {
+    const response = await axios.post(`${API_URL}/verify-otp`, { email, otp });
+    if (response.data && response.data.resetToken) {
+      return { success: true, resetToken: response.data.resetToken };
+    }
+    return { success: false, error: 'Respuesta inesperada del servidor.' };
+  } catch (error) {
+    let errorMessage = 'Ocurrió un error inesperado.';
+    if (axios.isAxiosError(error) && error.response) {
+      errorMessage = error.response.data.message || 'Error en la respuesta del servidor.';
+    }
+    return { success: false, error: errorMessage };
+  }
+};
+
 // Exportamos un objeto `AuthService` que contiene nuestra función `login`.
 export const AuthService = {
   login,
+  registerCredentials,
+  registerProfile,
+  forgotPassword,
+  verifyOtp,
+  resetPassword,
 };
