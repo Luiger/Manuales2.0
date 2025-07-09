@@ -10,6 +10,7 @@
     "type-gen": "npx expo-router/type-gen"
   },
   "dependencies": {
+    "@react-native-community/datetimepicker": "8.4.1",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/drawer": "^7.3.9",
     "@react-navigation/native": "^7.1.6",

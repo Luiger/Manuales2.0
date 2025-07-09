@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Alert
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView
 } from 'react-native';
-import { useRouter, Href } from 'expo-router';
+import { useRouter, Href, Link } from 'expo-router';
 import { AuthService } from '../src/services/auth.service';
 import * as SecureStore from 'expo-secure-store';
+import Stepper from '../components/Stepper';
+import CustomInput from '../components/CustomInput';
 
 const RegisterCredentialsScreen = () => {
   const router = useRouter();
@@ -19,6 +22,11 @@ const RegisterCredentialsScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const steps = [
+    { title: 'Credenciales' },
+    { title: 'Datos personales' },
+  ];
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
@@ -48,71 +56,95 @@ const RegisterCredentialsScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Crear Cuenta (Paso 1 de 2)</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Correo electrónico"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        cursorColor="#3B82F6"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        cursorColor="#3B82F6"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Confirmar Contraseña"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-        cursorColor="#3B82F6"
-      />
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
-        {loading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>Siguiente</Text>}
-      </TouchableOpacity>
-    </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.keyboardAvoidingContainer}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Crea tu cuenta</Text>
+          <Text style={styles.subtitle}>Por favor, introduce tus datos para iniciar sesión</Text>
+          <Stepper steps={steps} currentStep={1} />
+        </View>
+        <View style={styles.formContainer}>
+          <CustomInput
+            label="Correo electrónico"
+            placeholder="Ingresa tu correo"
+            value={email}
+            onChangeText={setEmail}
+          />
+          <CustomInput
+            label="Contraseña"
+            placeholder="Ingresa tu contraseña"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          <CustomInput
+            label="Confirmar Contraseña"
+            placeholder="Repite tu contraseña"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+          />
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
+            {loading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>Siguiente</Text>}
+          </TouchableOpacity>
+          <View style={styles.loginLinkContainer}>
+            <Text>¿Ya tienes una cuenta? </Text>
+            <Link href="/login" style={styles.loginLink}>
+              Inicia sesión
+            </Link>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  keyboardAvoidingContainer: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#F9FAFB',
+  },
+  container: {
+    flexGrow: 1,
     padding: 20,
     backgroundColor: '#F9FAFB',
+  },
+  header: {
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 10,
     color: '#1F2937',
   },
-  input: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    paddingHorizontal: 15,
+  subtitle: {
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    marginBottom: 15,
-    color: '#1F2937',
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#6B7280',
+  },
+  formContainer: {
+    // Estilos para el contenedor del formulario
+  },
+  label: {
+    fontSize: 14,
+    color: '#374151',
+    marginBottom: 8,
+    fontWeight: '500',
+  },
+  input: {
+    // Los estilos del input se definen en el componente CustomInput.
   },
   button: {
     width: '100%',
     height: 50,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#1E3A8A',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -127,6 +159,15 @@ const styles = StyleSheet.create({
     color: '#EF4444',
     textAlign: 'center',
     marginBottom: 10,
+  },
+  loginLinkContainer: {
+    marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  loginLink: {
+    color: '#3B82F6',
+    //textDecorationLine: 'underline',
   },
 });
 

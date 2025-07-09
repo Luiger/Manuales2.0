@@ -2,18 +2,19 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  Image,
-  TextInput,
   TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
   KeyboardAvoidingView,
   ScrollView,
   Keyboard,
   TouchableWithoutFeedback,
-  ActivityIndicator,
-  StyleSheet
+  Platform,
+  Image
 } from 'react-native';
 import { useRouter, Link, Href } from 'expo-router';
 import { AuthService } from '../src/services/auth.service'; // Importamos nuestro servicio
+import CustomInput from '../components/CustomInput';
 
 // --- Explicación de las importaciones ---
 // Componentes de React Native:
@@ -88,24 +89,18 @@ const LoginScreen = () => {
 
           {/* Inputs */}
           <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Correo electrónico"
+            <CustomInput
+              label="Correo electrónico"
+              placeholder="Ingresa tu correo"
               value={email}
               onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              placeholderTextColor="#9CA3AF"
-              cursorColor="#3B82F6" // Añadimos un color visible para el cursor
             />
-            <TextInput
-              style={styles.input}
-              placeholder="Contraseña"
+            <CustomInput
+              label="Contraseña"
+              placeholder="Ingresa tu contraseña"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              placeholderTextColor="#9CA3AF"
-              cursorColor="#3B82F6" // Añadimos cursorColor para consistencia
             />
           </View>
 
@@ -130,8 +125,11 @@ const LoginScreen = () => {
             <Link href={'/forgot-password' as Href} style={styles.link}>
               ¿Olvidaste tu contraseña?
             </Link>
-            <Link href={'/register' as Href} style={styles.link}>
-              ¿No tienes cuenta? Regístrate
+          </View>
+          <View style={styles.linksContainer}>
+            <Text>¿No tienes cuenta? </Text>
+            <Link href="/register" style={styles.link}>
+                        Regístrate
             </Link>
           </View>
         </ScrollView>
@@ -171,44 +169,35 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   input: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#D1D5DB', // Gris claro
-    color: '#1F2937', // Añadimos un color de texto explícito (gris oscuro)
-  },
-  errorText: {
-    color: '#EF4444', // Rojo
-    marginTop: 15,
-    textAlign: 'center',
+    // Los estilos del input se definen en el componente CustomInput.
   },
   button: {
     width: '100%',
     height: 50,
-    backgroundColor: '#3B82F6', // Azul
+    backgroundColor: '#1E3A8A',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
   },
+  errorText: {
+    color: '#EF4444',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
   linksContainer: {
-    marginTop: 25,
-    width: '100%',
-    alignItems: 'center',
-    gap: 15,
+    marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   link: {
-    color: '#3B82F6', // Azul
-    fontSize: 16,
+    color: '#3B82F6',
+    //textDecorationLine: '',
   },
 });
 
