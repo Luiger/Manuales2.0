@@ -11,13 +11,13 @@ const HomeScreen = () => {
   return (    
     <View style={styles.container}>
       <View style={styles.row}>
-        <Card
+        {/*<Card
           title="Elaboración de Manual Escala"
           subtitle="Manual de Contrataciones Públicas"
           tag="#UniversitasLegal"
           footerText="Manual"
           onPress={() => router.push('/manual')}
-        />
+        />*/}
         <Card
           title="Manual Sheet"
           subtitle="Manual de Contrataciones Públicas"

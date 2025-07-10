@@ -190,6 +190,7 @@ const styles = StyleSheet.create({
   },
   loginLink: {
     color: '#3B82F6',
+    fontWeight: 'bold',
     //textDecorationLine: 'underline',
   },
 });

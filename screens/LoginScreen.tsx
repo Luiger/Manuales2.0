@@ -197,6 +197,7 @@ const styles = StyleSheet.create({
   },
   link: {
     color: '#3B82F6',
+    fontWeight: 'bold',
     //textDecorationLine: '',
   },
 });
