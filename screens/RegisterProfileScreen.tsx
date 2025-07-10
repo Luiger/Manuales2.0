@@ -119,37 +119,6 @@ const RegisterProfileScreen = () => {
             value={profile.Cargo}
             onChangeText={(val) => handleInputChange('Cargo', val)}
           />
-          <Text style={styles.label}>Género</Text>
-          <View style={styles.genderContainer}>
-            <TouchableOpacity
-              style={styles.radioOption}
-              onPress={() => handleInputChange('Genero', 'Hombre')}
-            >
-              <Text style={[styles.radioText, profile.Genero === 'Hombre' && styles.radioTextSelected]}>Hombre</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.radioOption}
-              onPress={() => handleInputChange('Genero', 'Mujer')}
-            >
-              <Text style={[styles.radioText, profile.Genero === 'Mujer' && styles.radioTextSelected]}>Mujer</Text>
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.label}>Fecha de Nacimiento</Text>
-          <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePickerContainer}>
-            <Text style={styles.dateText}>
-              {profile.FechaNacimiento.toLocaleDateString()}
-            </Text>
-          </TouchableOpacity>
-          {showDatePicker && (
-            <DateTimePicker
-              testID="dateTimePicker"
-              value={profile.FechaNacimiento}
-              mode="date"
-              is24Hour={true}
-              display="default"
-              onChange={handleDateChange}
-            />
-          )}
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
           <TouchableOpacity style={styles.button} onPress={handleCompleteProfile} disabled={loading}>
             {loading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>Crear cuenta</Text>}

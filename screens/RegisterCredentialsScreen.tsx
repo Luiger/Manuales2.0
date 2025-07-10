@@ -14,6 +14,7 @@ import { AuthService } from '../src/services/auth.service';
 import * as SecureStore from 'expo-secure-store';
 import Stepper from '../components/Stepper';
 import CustomInput from '../components/CustomInput';
+import { validateEmail, validatePassword } from '../src/utils/validators';
 
 const RegisterCredentialsScreen = () => {
   const router = useRouter();
@@ -29,30 +30,52 @@ const RegisterCredentialsScreen = () => {
   ];
 
   const handleRegister = async () => {
+    // 1. Validación de campos vacíos
     if (!email || !password || !confirmPassword) {
       setError('Todos los campos son requeridos.');
       return;
     }
+    // 2. Validación de formato de correo electrónico
+    if (!validateEmail(email)) {
+      setError('Por favor, introduce un correo electrónico válido.');
+      return;
+    }
+    // 3. Validación de longitud de la contraseña
+    if (!validatePassword(password)) {
+      setError('La contraseña debe tener al menos 8 caracteres.');
+      return;
+    }
+    // 4. Validación de coincidencia de contraseñas
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
       return;
     }
 
+    // Si todas las validaciones pasan, limpiamos los errores y empezamos la carga.
     setError('');
     setLoading(true);
 
-    const result = await AuthService.registerCredentials(email, password);
+    try {
+      // Llamamos al servicio de autenticación para registrar las credenciales.
+      const result = await AuthService.registerCredentials(email, password);
 
-    if (result.success && result.tempToken) {
-      // Guardamos el token temporal para el siguiente paso
-      await SecureStore.setItemAsync('tempRegToken', result.tempToken);
-      // Navegamos al segundo paso del registro
-      router.push('/register-profile' as Href);
-    } else {
-      setError(result.error || 'Ocurrió un error durante el registro.');
+      // Si el registro de credenciales es exitoso y obtenemos un token temporal...
+      if (result.success && result.tempToken) {
+        // Guardamos el token de forma segura para usarlo en el siguiente paso.
+        await SecureStore.setItemAsync('tempRegToken', result.tempToken);
+        // Navegamos a la pantalla de perfil de registro.
+        router.push('/register-profile' as Href);
+      } else {
+        // Si el servicio devuelve un error, lo mostramos.
+        setError(result.error || 'Ocurrió un error durante el registro.');
+      }
+    } catch (e) {
+      // Capturamos cualquier error inesperado durante el proceso.
+      setError('Ocurrió un error inesperado. Inténtalo de nuevo.');
+    } finally {
+      // Se ejecuta siempre, al final del try/catch.
+      setLoading(false); // Detenemos el indicador de carga.
     }
-
-    setLoading(false);
   };
 
   return (
