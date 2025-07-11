@@ -1,14 +1,15 @@
-import { SafeAreaView } from 'react-native-safe-area-context';
-
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Card from '../components/Card';
+import { View, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import Card from '../components/Card';
 
 const HomeScreen = () => {
   const router = useRouter();
 
-  return (    
+  // La lógica de verificación se movió a Manuales2Screen.
+  // El onPress ahora es una navegación simple y directa.
+  
+  return (
     <View style={styles.container}>
       <View style={styles.row}>
         <Card
@@ -30,10 +31,9 @@ const HomeScreen = () => {
           subtitle="Conoce más de Universitas"
           tag="#UniversitasLegal"
           footerText="Repositorio Legal"
-          //onPress={() => router.push('/home')}
         />
       </View>
-    </View>    
+    </View>
   );
 };
 

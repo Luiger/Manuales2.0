@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -41,10 +41,37 @@ const Manuales2Screen = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isVerifying, setIsVerifying] = useState(true);
+
+  useEffect(() => {
+    const verifyStatus = async () => {
+      try {
+        const { hasSubmitted } = await FormService.checkSubmissionStatus();
+        if (hasSubmitted) {
+          Alert.alert(
+            'Límite alcanzado',
+            'Ya has llenado este formulario.',
+            [{ text: 'OK', onPress: () => router.back() }]
+          );
+        } else {
+          setIsVerifying(false);
+        }
+      } catch (e) {
+        Alert.alert('Error', 'No se pudo verificar el estado del formulario. Intenta de nuevo.');
+        router.back();
+      }
+    };
+
+    verifyStatus();
+  }, []);
 
   const isFormValid =
     formData.emailPrincipal.trim() !== '' &&
     formData.nombreInstitucion.trim() !== '' &&
+    formData.siglasInstitucion.trim() !== '' &&
+    formData.unidadGestion.trim() !== '' &&
+    formData.unidadSistemas.trim() !== '' &&
+    formData.unidadContratante.trim() !== '' &&
     formData.personaContacto.trim() !== '' &&
     formData.telefono.trim() !== '' &&
     formData.emailContacto.trim() !== '';
@@ -60,7 +87,6 @@ const Manuales2Screen = () => {
     }
     setError('');
     setLoading(true);
-
     try {
       const payload = {
         'Dirección de correo electrónico': formData.emailPrincipal,
@@ -73,11 +99,13 @@ const Manuales2Screen = () => {
         'Teléfono': formData.telefono,
         'Correo electrónico': formData.emailContacto,
       };
-
       const result = await FormService.submitManualContrataciones(payload);
-
       if (result.success) {
-        Alert.alert('Éxito', 'Formulario enviado correctamente.');
+        Alert.alert(
+          'Éxito',
+          'Formulario enviado correctamente. Serás redirigido al inicio.',
+          [{ text: 'OK', onPress: () => router.replace('/home') }]
+        );
       } else {
         setError(result.error || 'Ocurrió un error al enviar el formulario.');
       }
@@ -88,11 +116,19 @@ const Manuales2Screen = () => {
     }
   };
 
+  if (isVerifying) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#1E3A8A" />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
       <KeyboardAwareScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={styles.scrollContainer} // Clave para que el layout funcione
+        contentContainerStyle={styles.scrollContainer}
         resetScrollToCoords={{ x: 0, y: 0 }}
         scrollEnabled={true}
         showsVerticalScrollIndicator={false}
@@ -100,17 +136,10 @@ const Manuales2Screen = () => {
         enableOnAndroid={true}
         extraScrollHeight={40}
       >
-        {/* 1. Contenedor interno que organiza el contenido */}
         <View style={styles.innerContainer}>
-          {/* Contenido principal del formulario */}
           <View>
-            {/*<View style={styles.header}>
-              <Text style={styles.title}>Formulario de Contrataciones</Text>
-              <Text style={styles.subtitle}>Por favor, introduce los datos requeridos</Text>
-            </View>*/}
-
             <View style={styles.formContainer}>
-              <CustomInput
+               <CustomInput
                 label="Dirección de correo electrónico"
                 placeholder="correo@institucion.com"
                 value={formData.emailPrincipal}
@@ -170,7 +199,6 @@ const Manuales2Screen = () => {
             </View>
           </View>
 
-          {/* Footer con el botón, que se empuja hacia abajo */}
           <View style={styles.footer}>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <TouchableOpacity
@@ -192,38 +220,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9FAFB',
   },
-  // 2. El contenedor del scroll debe permitir que su contenido crezca
   scrollContainer: {
     flexGrow: 1,
   },
-  // 3. El contenedor interno usa flexbox para distribuir el espacio
   innerContainer: {
-    flex: 1, // Ocupa todo el espacio disponible
-    justifyContent: 'space-between', // Empuja el contenido y el footer a los extremos
+    flex: 1,
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 25,
   },
-  header: {
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-    color: '#1F2937',
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#6B7280',
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
   },
   formContainer: {
-    // No necesita estilos especiales aquí
   },
   footer: {
-    // Un padding superior asegura que no esté pegado al último input
     paddingTop: 24,
   },
   button: {
