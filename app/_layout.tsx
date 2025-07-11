@@ -38,6 +38,9 @@ export default function RootLayout() {
         <Stack.Screen name="verify-otp" options={{ title: 'Verificar Código' }} />
         <Stack.Screen name="reset-password" options={{ title: 'Restablecer Contraseña' }} />
 
+        {/* Pantalla para el nuevo formulario de contrataciones */}
+        <Stack.Screen name="manuales2" options={{ title: 'Manual de Contrataciones' }} />
+
         {/* Las pantallas que ya existían */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="manual" options={{ title: 'Manual Escala' }} />

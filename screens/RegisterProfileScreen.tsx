@@ -24,9 +24,9 @@ const RegisterProfileScreen = () => {
     Apellido: '',
     Telefono: '',
     Institucion: '',
-    Cargo: '',
-    Genero: '',
-    FechaNacimiento: new Date(),
+    Cargo: ''
+    //Genero: '',
+    //FechaNacimiento: new Date(),
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -47,11 +47,11 @@ const RegisterProfileScreen = () => {
     setProfile(prevState => ({ ...prevState, [name]: value }));
   };
 
-  const handleDateChange = (event: any, selectedDate: Date | undefined) => {
+  /*const handleDateChange = (event: any, selectedDate: Date | undefined) => {
     const currentDate = selectedDate || profile.FechaNacimiento;
     setShowDatePicker(Platform.OS === 'ios');
     setProfile(prevState => ({ ...prevState, FechaNacimiento: currentDate }));
-  };
+  };*/
 
   const handleCompleteProfile = async () => {
     // 2. Se añade la validación al presionar el botón como doble seguridad.
