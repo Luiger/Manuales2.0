@@ -98,6 +98,7 @@ const LoginScreen = () => {
               value={email}
               onChangeText={setEmail}
               containerStyle={styles.inputContainerCustomInput}
+              autoCapitalize="none"
             />
             <CustomInput
               label="Contraseña"

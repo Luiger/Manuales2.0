@@ -20,6 +20,9 @@ interface CustomInputProps {
   keyboardType?: string;
   // 2. Se añade la nueva propiedad opcional para los estilos del contenedor
   containerStyle?: StyleProp<ViewStyle>;
+  // ✅ NUEVO: Se añaden las propiedades que causaban el error
+  maxLength?: number;
+  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
 }
 
 const CustomInput = ({
@@ -31,6 +34,9 @@ const CustomInput = ({
   keyboardType,
   // 3. Se recibe la nueva propiedad
   containerStyle,
+  // ✅ NUEVO: Se reciben las nuevas propiedades
+  maxLength,
+  autoCapitalize,
 }: CustomInputProps) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -46,6 +52,9 @@ const CustomInput = ({
           onChangeText={onChangeText}
           secureTextEntry={secureTextEntry && !isPasswordVisible}
           placeholderTextColor="#9CA3AF"
+          // ✅ NUEVO: Se pasan las propiedades al TextInput nativo
+          maxLength={maxLength}
+          autoCapitalize={autoCapitalize}
         />
         {secureTextEntry && (
           <TouchableOpacity

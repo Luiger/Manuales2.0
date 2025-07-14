@@ -1,140 +1,247 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform
-} from 'react-native';
-import { useRouter, Href } from 'expo-router';
+import { View, Text, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter, Link } from 'expo-router';
 import { AuthService } from '../src/services/auth.service';
+import CustomInput from '../components/CustomInput';
 import Stepper from '../components/Stepper';
+import * as SecureStore from 'expo-secure-store';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { ChevronLeftIcon } from 'react-native-heroicons/outline';
 
 const ForgotPasswordScreen = () => {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const steps = [
-    { title: 'Enviar correo' },
-    { title: 'Código' },
-    { title: 'Recuperar Contraseña' },
-  ];
-
-  const handleForgotPassword = async () => {
-    if (!email) {
-      setError('Por favor, introduce tu correo electrónico.');
-      return;
-    }
-    setLoading(true);
-    setError('');
-
-    await AuthService.forgotPassword(email);
-    setLoading(false);
+    const router = useRouter();
     
-    // Navegamos a la pantalla de verificación de OTP, pasando el email.
-    // Usamos `as any` como último recurso para solucionar el problema de tipado persistente de Expo Router.
-    router.push({ pathname: '/verify-otp' as any, params: { email } });
-  };
+    const [step, setStep] = useState(1); 
+    const [email, setEmail] = useState('');
+    const [otp, setOtp] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-  return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.keyboardAvoidingContainer}
-    >
-      <View style={styles.stepperContainer}>
-        <Stepper steps={steps} currentStep={1} />
-      </View>
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Recuperar contraseña</Text>
-        <Text style={styles.subtitle}>
-          Ingresa el correo electrónico asociado a tu cuenta para recuperar tu contraseña.
+    const steps = [
+        { title: 'Enviar correo' },
+        { title: 'Código' },
+        { title: 'Recuperar Contraseña' },
+    ];
+
+    const handleSendEmail = async () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setError('Por favor, introduce un correo electrónico válido.');
+            return;
+        }
+        setLoading(true);
+        setError('');
+        await AuthService.forgotPassword(email);
+        setLoading(false);
+        setStep(2);
+    };
+
+    const handleVerifyOtp = async () => {
+        if (!otp || otp.length !== 6) {
+            setError('Por favor, introduce un código de 6 dígitos.');
+            return;
+        }
+        setLoading(true);
+        setError('');
+        const result = await AuthService.verifyOtp(email, otp);
+        if (result.success && result.resetToken) {
+            await SecureStore.setItemAsync('resetToken', result.resetToken);
+            setStep(3);
+        } else {
+            setError(result.error || 'Código incorrecto o expirado.');
+        }
+        setLoading(false);
+    };
+
+    const handleResetPassword = async () => {
+        if (!password || !confirmPassword) {
+            setError('Todos los campos son requeridos.');
+            return;
+        }
+        if (password.length < 8) {
+            setError('La nueva contraseña debe tener al menos 8 caracteres.');
+            return;
+        }
+        if (password !== confirmPassword) {
+            setError('Las contraseñas no coinciden.');
+            return;
+        }
+        setLoading(true);
+        setError('');
+        const resetToken = await SecureStore.getItemAsync('resetToken');
+        if (!resetToken) {
+            setError('Sesión inválida. Por favor, inicia el proceso de nuevo.');
+            setLoading(false);
+            return;
+        }
+        const result = await AuthService.resetPassword(password, resetToken);
+        if (result.success) {
+            await SecureStore.deleteItemAsync('resetToken');
+            Alert.alert('Éxito', 'Tu contraseña ha sido actualizada. Por favor, inicia sesión.', [
+                { text: 'OK', onPress: () => router.replace('/login') }
+            ]);
+        } else {
+            setError(result.error || 'Ocurrió un error al restablecer la contraseña.');
+        }
+        setLoading(false);
+    };
+
+    const renderStepContent = () => {
+        switch (step) {
+            case 1:
+                return (
+                    <View style={styles.formContainer}>
+                        <CustomInput
+                            label="Correo electrónico"
+                            placeholder="Ingresa tu correo"
+                            value={email}
+                            onChangeText={setEmail}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            containerStyle={styles.inputContainer}
+                        />
+                        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+                        <TouchableOpacity style={styles.button} onPress={handleSendEmail} disabled={loading}>
+                            {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.buttonText}>Enviar</Text>}
+                        </TouchableOpacity>
+                    </View>
+                );
+            case 2:
+                return (
+                    <View style={styles.formContainer}>
+                        <CustomInput
+                            label="Código de Verificación"
+                            placeholder="123456"
+                            value={otp}
+                            onChangeText={setOtp}
+                            keyboardType="number-pad"
+                            maxLength={6}
+                            containerStyle={styles.inputContainer}
+                        />
+                        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+                        <TouchableOpacity style={styles.button} onPress={handleVerifyOtp} disabled={loading}>
+                            {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.buttonText}>Verificar</Text>}
+                        </TouchableOpacity>
+                    </View>
+                );
+            case 3:
+                return (
+                    <View style={styles.formContainer}>
+                        <CustomInput
+                            label="Nueva Contraseña"
+                            placeholder="Mínimo 8 caracteres"
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry
+                            containerStyle={styles.inputContainer}
+                        />
+                        <CustomInput
+                            label="Confirmar Nueva Contraseña"
+                            placeholder="Confirma tu nueva contraseña"
+                            value={confirmPassword}
+                            onChangeText={setConfirmPassword}
+                            secureTextEntry
+                            containerStyle={styles.inputContainer}
+                        />
+                        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+                        <TouchableOpacity style={styles.button} onPress={handleResetPassword} disabled={loading}>
+                            {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.buttonText}>Actualizar Contraseña</Text>}
+                        </TouchableOpacity>
+                    </View>
+                );
+            default:
+                return null;
+        }
+    };
+
+    const getTitle = () => {
+        switch(step) {
+            case 1: return 'Recuperar Contraseña';
+            case 2: return 'Verificar Código';
+            case 3: return 'Establecer Nueva Contraseña';
+            default: return '';
+        }
+    };
+
+    const getSubtitle = () => {
+        switch(step) {
+            case 1: return 'Ingresa el correo electrónico asociado a tu cuenta.';
+            case 2:
+    return (
+        <Text>
+            Hemos enviado un código a{'\n'}
+            <Text style={{ fontWeight: 'bold' }}>{email}</Text>
         </Text>
-        <Text style={styles.label}>Correo electrónico</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ingresa tu correo"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          cursorColor="#3B82F6"
-        />
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        <TouchableOpacity style={styles.button} onPress={handleForgotPassword} disabled={loading}>
-          {loading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>Enviar</Text>}
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
-  );
+    );
+            case 3: return 'Tu nueva contraseña debe ser segura.';
+            default: return '';
+        }
+    };
+
+    return (
+        <SafeAreaView style={styles.container}>
+            {/* El header manual se ha eliminado */}
+            <KeyboardAwareScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={styles.scrollContainer}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                enableOnAndroid={true}
+            >
+                <View style={styles.titleContainer}>
+                    <Text style={styles.mainTitle}>{getTitle()}</Text>
+                    <Text style={styles.subtitle}>{getSubtitle()}</Text>
+                </View>
+
+                <View style={styles.stepperWrapper}>
+                    <Stepper steps={steps} currentStep={step} />
+                </View>
+
+                {renderStepContent()}
+            </KeyboardAwareScrollView>
+        </SafeAreaView>
+    );
 };
 
 const styles = StyleSheet.create({
-  keyboardAvoidingContainer: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
+  container: { flex: 1, backgroundColor: '#F9FAFB' },
+  // Los estilos 'header' y 'backButton' se han eliminado
+  scrollContainer: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingBottom: 40, 
   },
-  stepperContainer: {
-    // Contenedor para el stepper, no se mueve
+  titleContainer: {
+    paddingTop: 10,
   },
-  formContainer: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    padding: 20,
-    paddingTop: 40,
-  },
-  title: {
-    fontSize: 22,
+  mainTitle: {
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#1F2937',
+    textAlign: 'center',
+  },
+  inputContainer: {
+    marginBottom: 15,
   },
   subtitle: {
     fontSize: 16,
-    marginBottom: 30,
     color: '#6B7280',
-  },
-  label: {
-    fontSize: 14,
-    color: '#374151',
-    marginBottom: 8,
-    fontWeight: '500',
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    marginBottom: 15,
-    color: '#1F2937',
-  },
-  button: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#1E3A8A', // Azul más oscuro
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  errorText: {
-    color: '#EF4444',
     textAlign: 'center',
+    marginTop: 10,
     marginBottom: 10,
   },
+  stepperWrapper: {
+    paddingHorizontal: '2%',
+    marginBottom: 20,
+  },
+  formContainer: {
+    // Ya no necesita padding, el scrollContainer lo maneja
+  },
+  button: { width: '100%', height: 50, backgroundColor: '#1E3A8A', borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
+  buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
+  errorText: { color: 'red', textAlign: 'center', marginTop: 15 },
 });
 
 export default ForgotPasswordScreen;

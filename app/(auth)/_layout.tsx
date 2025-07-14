@@ -1,25 +1,34 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import React from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
+import { TouchableOpacity } from 'react-native';
+import { ChevronLeftIcon } from 'react-native-heroicons/outline';
 
 export default function AuthLayout() {
+  const router = useRouter();
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-        <SafeAreaProvider>
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerTitle: '', 
+        headerShadowVisible: false,
+        headerStyle: { backgroundColor: '#F9FAFB' },
+        // ✅ CORRECCIÓN: Esta línea le dice al navegador que oculte su botón nativo de "volver".
+        headerBackVisible: false,        
+
+        headerLeft: () => (
+          <TouchableOpacity onPress={() => router.back()} style={{ padding: 8, marginLeft: 0 }}>
+            <ChevronLeftIcon size={28} color="#1F2937" />
+          </TouchableOpacity>
+        ),
+      }}
+    >
       <Stack.Screen name="login" options={{ headerShown: false }} />
       
-      {/* Nuevas pantallas de registro y recuperación */}
-          <Stack.Screen name="register" options={{ title: 'Registro - Paso 1' }} />
-          <Stack.Screen name="register-profile" options={{ title: 'Registro - Paso 2' }} />
-          <Stack.Screen name="forgot-password" options={{ title: 'Recuperar Contraseña' }} />
-          <Stack.Screen name="verify-otp" options={{ title: 'Verificar Código' }} />
-          <Stack.Screen name="reset-password" options={{ title: 'Restablecer Contraseña' }} />
+      <Stack.Screen name="register" />
+      <Stack.Screen name="register-profile" />
+      <Stack.Screen name="forgot-password" />
+      {/*<Stack.Screen name="verify-otp" />
+      <Stack.Screen name="reset-password" />*/}
     </Stack>
-        </SafeAreaProvider>
-    </GestureHandlerRootView>
   );
 }

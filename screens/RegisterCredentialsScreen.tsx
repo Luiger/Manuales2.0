@@ -5,9 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
-  ScrollView
 } from 'react-native';
 import { useRouter, Href, Link } from 'expo-router';
 import { AuthService } from '../src/services/auth.service';
@@ -15,6 +13,9 @@ import * as SecureStore from 'expo-secure-store';
 import Stepper from '../components/Stepper';
 import CustomInput from '../components/CustomInput';
 import { validateEmail, validatePassword } from '../src/utils/validators';
+// 1. Se importa KeyboardAwareScrollView y se eliminan los otros componentes de scroll
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const RegisterCredentialsScreen = () => {
   const router = useRouter();
@@ -30,117 +31,117 @@ const RegisterCredentialsScreen = () => {
   ];
 
   const handleRegister = async () => {
-    // 1. Validación de campos vacíos
     if (!email || !password || !confirmPassword) {
       setError('Todos los campos son requeridos.');
       return;
     }
-    // 2. Validación de formato de correo electrónico
     if (!validateEmail(email)) {
       setError('Por favor, introduce un correo electrónico válido.');
       return;
     }
-    // 3. Validación de longitud de la contraseña
     if (!validatePassword(password)) {
       setError('La contraseña debe tener al menos 8 caracteres.');
       return;
     }
-    // 4. Validación de coincidencia de contraseñas
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
       return;
     }
 
-    // Si todas las validaciones pasan, limpiamos los errores y empezamos la carga.
     setError('');
     setLoading(true);
 
     try {
-      // Llamamos al servicio de autenticación para registrar las credenciales.
       const result = await AuthService.registerCredentials(email, password);
 
-      // Si el registro de credenciales es exitoso y obtenemos un token temporal...
       if (result.success && result.tempToken) {
-        // Guardamos el token de forma segura para usarlo en el siguiente paso.
         await SecureStore.setItemAsync('tempRegToken', result.tempToken);
-        // Navegamos a la pantalla de perfil de registro.
         router.push('/register-profile' as Href);
       } else {
-        // Si el servicio devuelve un error, lo mostramos.
         setError(result.error || 'Ocurrió un error durante el registro.');
       }
     } catch (e) {
-      // Capturamos cualquier error inesperado durante el proceso.
       setError('Ocurrió un error inesperado. Inténtalo de nuevo.');
     } finally {
-      // Se ejecuta siempre, al final del try/catch.
-      setLoading(false); // Detenemos el indicador de carga.
+      setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.keyboardAvoidingContainer}
-    >
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Crea tu cuenta</Text>
-          <Text style={styles.subtitle}>Por favor, introduce tus datos para iniciar sesión</Text>
-          <Stepper steps={steps} currentStep={1} />
-        </View>
-        <View style={styles.formContainer}>
-          <CustomInput
-            label="Correo electrónico"
-            placeholder="Ingresa tu correo"
-            value={email}
-            onChangeText={setEmail}
-            containerStyle={styles.inputContainer}
-          />
-          <CustomInput
-            label="Contraseña"
-            placeholder="Ingresa tu contraseña"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            containerStyle={styles.inputContainer}
-          />
-          <CustomInput
-            label="Confirmar Contraseña"
-            placeholder="Repite tu contraseña"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-            containerStyle={styles.inputContainer}
-          />
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
-          <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
-            {loading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>Siguiente</Text>}
-          </TouchableOpacity>
-          <View style={styles.loginLinkContainer}>
-            <Text>¿Ya tienes una cuenta? </Text>
-            <Link href="/login" style={styles.loginLink}>
-              Inicia sesión
-            </Link>
-          </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    // 2. Se reemplaza KeyboardAvoidingView por SafeAreaView
+    <SafeAreaView style={styles.safeArea}>
+        {/* 3. Se usa KeyboardAwareScrollView para envolver todo el contenido */}
+        <KeyboardAwareScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={styles.container}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            enableOnAndroid={true}
+            extraScrollHeight={20}
+        >
+            <View style={styles.header}>
+                <Text style={styles.title}>Crea tu cuenta</Text>
+                <Text style={styles.subtitle}>Por favor, introduce tus datos para iniciar sesión</Text>
+                <Stepper steps={steps} currentStep={1} />
+            </View>
+
+            <View style={styles.formContainer}>
+                <CustomInput
+                    label="Correo electrónico"
+                    placeholder="Ingresa tu correo"
+                    value={email}
+                    onChangeText={setEmail}
+                    autoCapitalize="none"
+                    containerStyle={styles.inputContainer}
+                />
+                <CustomInput
+                    label="Contraseña"
+                    placeholder="Ingresa tu contraseña"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                    containerStyle={styles.inputContainer}
+                />
+                <CustomInput
+                    label="Confirmar Contraseña"
+                    placeholder="Repite tu contraseña"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry
+                    containerStyle={styles.inputContainer}
+                />
+            </View>
+
+            {/* Se agrupa el contenido inferior para un mejor manejo del layout */}
+            <View style={styles.footer}>
+                {error ? <Text style={styles.errorText}>{error}</Text> : null}
+                <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
+                    {loading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>Siguiente</Text>}
+                </TouchableOpacity>
+                <View style={styles.loginLinkContainer}>
+                    <Text>¿Ya tienes una cuenta? </Text>
+                    <Link href="/login" style={styles.loginLink}>
+                    Inicia sesión
+                    </Link>
+                </View>
+            </View>
+        </KeyboardAwareScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  keyboardAvoidingContainer: {
+  safeArea: {
     flex: 1,
     backgroundColor: '#F9FAFB',
   },
   container: {
     flexGrow: 1,
-    padding: 20,
-    backgroundColor: '#F9FAFB',
+    padding: 20,// Asegura que el footer quede abajo
   },
   header: {
     marginBottom: 20,
+    
   },
   title: {
     fontSize: 24,
@@ -156,19 +157,13 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   formContainer: {
-    // Estilos para el contenedor del formulario
+    // No necesita estilos complejos
   },
-  label: {
-    fontSize: 14,
-    color: '#374151',
-    marginBottom: 8,
-    fontWeight: '500',
+  footer: {
+    paddingTop: 10,
   },
   inputContainer: {
     marginBottom: 15,
-  },
-  input: {
-    // Los estilos del input se definen en el componente CustomInput.
   },
   button: {
     width: '100%',
@@ -197,7 +192,6 @@ const styles = StyleSheet.create({
   loginLink: {
     color: '#3B82F6',
     fontWeight: 'bold',
-    //textDecorationLine: 'underline',
   },
 });
 
