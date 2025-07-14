@@ -95,6 +95,7 @@ const RegisterCredentialsScreen = () => {
             placeholder="Ingresa tu correo"
             value={email}
             onChangeText={setEmail}
+            containerStyle={styles.inputContainer}
           />
           <CustomInput
             label="Contraseña"
@@ -102,6 +103,7 @@ const RegisterCredentialsScreen = () => {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            containerStyle={styles.inputContainer}
           />
           <CustomInput
             label="Confirmar Contraseña"
@@ -109,6 +111,7 @@ const RegisterCredentialsScreen = () => {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
+            containerStyle={styles.inputContainer}
           />
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
           <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
@@ -160,6 +163,9 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 8,
     fontWeight: '500',
+  },
+  inputContainer: {
+    marginBottom: 15,
   },
   input: {
     // Los estilos del input se definen en el componente CustomInput.

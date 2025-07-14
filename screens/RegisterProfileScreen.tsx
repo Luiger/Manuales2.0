@@ -108,12 +108,14 @@ const RegisterProfileScreen = () => {
               placeholder="Ingresa tu nombre"
               value={profile.Nombre}
               onChangeText={(val) => handleInputChange('Nombre', val)}
+              containerStyle={styles.inputContainer}
             />
             <CustomInput
               label="Apellido"
               placeholder="Ingresa tu apellido"
               value={profile.Apellido}
               onChangeText={(val) => handleInputChange('Apellido', val)}
+              containerStyle={styles.inputContainer}
             />
             <CustomInput
               label="Teléfono"
@@ -121,18 +123,21 @@ const RegisterProfileScreen = () => {
               value={profile.Telefono}
               onChangeText={(val) => handleInputChange('Telefono', val)}
               keyboardType="phone-pad"
+              containerStyle={styles.inputContainer}
             />
             <CustomInput
               label="Institución"
               placeholder="Ingresa tu institución"
               value={profile.Institucion}
               onChangeText={(val) => handleInputChange('Institucion', val)}
+              containerStyle={styles.inputContainer}
             />
             <CustomInput
               label="Cargo"
               placeholder="Ingresa tu cargo"
               value={profile.Cargo}
               onChangeText={(val) => handleInputChange('Cargo', val)}
+              containerStyle={styles.inputContainer}
             />
           </View>
         </View>
@@ -182,6 +187,9 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 20,
+  },
+  inputContainer: {
+    marginBottom: 15,
   },
   title: {
     fontSize: 22,

@@ -145,42 +145,49 @@ const Manuales2Screen = () => {
                 value={formData.emailPrincipal}
                 onChangeText={(val) => handleInputChange('emailPrincipal', val)}
                 keyboardType="email-address"
+                containerStyle={styles.inputContainer}
               />
               <CustomInput
                 label="Nombre de la Institución / Ente / Órgano"
                 placeholder="Ingrese el nombre completo"
                 value={formData.nombreInstitucion}
                 onChangeText={(val) => handleInputChange('nombreInstitucion', val)}
+                containerStyle={styles.inputContainer}
               />
               <CustomInput
                 label="Acrónimo / Siglas de la Institución"
                 placeholder="Ej: MOPC"
                 value={formData.siglasInstitucion}
                 onChangeText={(val) => handleInputChange('siglasInstitucion', val)}
+                containerStyle={styles.inputContainer}
               />
               <CustomInput
                 label="Unidad Responsable (Gestión Adm. y Fin.)"
                 placeholder="Ingrese la unidad de gestión"
                 value={formData.unidadGestion}
                 onChangeText={(val) => handleInputChange('unidadGestion', val)}
+                containerStyle={styles.inputContainer}
               />
               <CustomInput
                 label="Unidad Responsable (Sistemas y Tec.)"
                 placeholder="Ingrese la unidad de tecnología"
                 value={formData.unidadSistemas}
                 onChangeText={(val) => handleInputChange('unidadSistemas', val)}
+                containerStyle={styles.inputContainer}
               />
               <CustomInput
                 label="Unidad Contratante"
                 placeholder="Ingrese la unidad contratante"
                 value={formData.unidadContratante}
                 onChangeText={(val) => handleInputChange('unidadContratante', val)}
+                containerStyle={styles.inputContainer}
               />
               <CustomInput
                 label="Persona de contacto"
                 placeholder="Nombre y Apellido"
                 value={formData.personaContacto}
                 onChangeText={(val) => handleInputChange('personaContacto', val)}
+                containerStyle={styles.inputContainer}
               />
               <CustomInput
                 label="Teléfono"
@@ -188,6 +195,7 @@ const Manuales2Screen = () => {
                 value={formData.telefono}
                 onChangeText={(val) => handleInputChange('telefono', val)}
                 keyboardType="phone-pad"
+                containerStyle={styles.inputContainer}
               />
               <CustomInput
                 label="Correo electrónico de contacto"
@@ -195,6 +203,7 @@ const Manuales2Screen = () => {
                 value={formData.emailContacto}
                 onChangeText={(val) => handleInputChange('emailContacto', val)}
                 keyboardType="email-address"
+                containerStyle={styles.inputContainer}
               />
             </View>
           </View>
@@ -239,6 +248,9 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingTop: 24,
+  },
+  inputContainer: {
+    marginBottom: 15,
   },
   button: {
     width: '100%',

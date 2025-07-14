@@ -6,10 +6,7 @@ import * as SecureStore from 'expo-secure-store';
 // en lo que respecta a la autenticación.
 
 // --- Constantes ---
-// `API_URL`: La URL base de tu backend. Es una buena práctica tenerla en un
-// archivo de configuración, pero por ahora la definimos aquí.
-// Asegúrate de que el puerto coincida con el de tu backend.
-const API_URL = 'https://7c7f5b5c73d1.ngrok-free.app/api/auth'; // Ajustado al puerto 3000
+const API_URL = 'https://c16f1fe83b2d.ngrok-free.app/api/auth';
 
 // --- Interfaces ---
 interface AuthResponse {
@@ -31,8 +28,6 @@ interface RegisterCredentialsResponse {
 }
 
 // --- Función de Login ---
-// `login`: Función asíncrona que maneja la petición de inicio de sesión.
-// Se añaden los tipos explícitos a los parámetros para cumplir con TypeScript.
 const login = async (email: string, password: string): Promise<AuthResponse> => {
   try {
     const response = await axios.post(`${API_URL}/login`, { email, password });
@@ -42,17 +37,12 @@ const login = async (email: string, password: string): Promise<AuthResponse> => 
     }
     return { success: false, error: 'Respuesta inesperada del servidor.' };
   } catch (error) {
-    // --- 3. Manejo de Errores ---
-    // Se maneja el error de tipo `unknown` de forma segura.
     let errorMessage = 'Ocurrió un error inesperado.';
     
-    // Verificamos si el error es una instancia de AxiosError.
     if (axios.isAxiosError(error)) {
-      // Si tiene una respuesta del servidor, usamos el mensaje de esa respuesta.
       if (error.response) {
         errorMessage = error.response.data.message || 'Error en la respuesta del servidor.';
       } else if (error.request) {
-        // Si la petición se hizo pero no se recibió respuesta (ej. sin conexión).
         errorMessage = 'No se pudo conectar con el servidor.';
       }
     }
@@ -62,7 +52,6 @@ const login = async (email: string, password: string): Promise<AuthResponse> => 
   }
 };
 
-// --- Exportación ---
 // --- Función de Registro (Paso 1: Credenciales) ---
 const registerCredentials = async (email: string, password: string): Promise<RegisterCredentialsResponse> => {
   try {
@@ -102,7 +91,6 @@ const forgotPassword = async (email: string): Promise<AuthResponse> => {
     await axios.post(`${API_URL}/forgot-password`, { email });
     return { success: true };
   } catch (error) {
-    // No devolvemos el error específico para no revelar si un email existe o no.
     return { success: false, error: 'Si el correo existe, se ha enviado un enlace.' };
   }
 };
@@ -123,7 +111,6 @@ const resetPassword = async (password: string, resetToken: string): Promise<Auth
   }
 };
 
-
 // --- Función para Verificar el Código OTP ---
 const verifyOtp = async (email: string, otp: string): Promise<VerifyOtpResponse> => {
   try {
@@ -141,7 +128,24 @@ const verifyOtp = async (email: string, otp: string): Promise<VerifyOtpResponse>
   }
 };
 
-// Exportamos un objeto `AuthService` que contiene nuestra función `login`.
+// --- ✅ NUEVA FUNCIÓN DE LOGOUT ---
+// Limpia los datos de sesión del dispositivo para desloguear al usuario.
+const logout = async (): Promise<void> => {
+  try {
+    // Elimina el token de usuario que mantiene la sesión activa.
+    await SecureStore.deleteItemAsync('userToken');
+    
+    // También es buena práctica limpiar otros tokens temporales si existen.
+    await SecureStore.deleteItemAsync('resetToken');
+    await SecureStore.deleteItemAsync('tempRegToken');
+  } catch (error) {
+    console.error('Error durante el logout en el servicio:', error);
+    // No es necesario lanzar un error aquí, el objetivo es desloguear al usuario.
+  }
+};
+
+// --- ✅ EXPORTACIÓN ACTUALIZADA ---
+// Añadimos la nueva función 'logout' al objeto exportado.
 export const AuthService = {
   login,
   registerCredentials,
@@ -149,4 +153,5 @@ export const AuthService = {
   forgotPassword,
   verifyOtp,
   resetPassword,
+  logout, // <-- AÑADIDO
 };

@@ -4,6 +4,6 @@
 // Expo Router escanea el directorio `app` y crea una ruta por cada archivo.
 // Así, `app/login.tsx` se convierte en la URL `http://localhost:8081/login`.
 
-import LoginScreen from '../screens/LoginScreen';
+import LoginScreen from '../../screens/LoginScreen';
 
 export default LoginScreen;

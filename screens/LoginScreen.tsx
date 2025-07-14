@@ -75,7 +75,8 @@ const LoginScreen = () => {
   // --- Renderizado de la Interfaz (UI) ---
   return (
    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>    
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+    <KeyboardAvoidingView style={{ flex: 1 }} 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={styles.container}>
           {/* Logo */}
@@ -96,6 +97,7 @@ const LoginScreen = () => {
               placeholder="Ingresa tu correo"
               value={email}
               onChangeText={setEmail}
+              containerStyle={styles.inputContainerCustomInput}
             />
             <CustomInput
               label="Contraseña"
@@ -103,6 +105,7 @@ const LoginScreen = () => {
               value={password}
               onChangeText={setPassword}
               secureTextEntry
+              containerStyle={styles.inputContainerCustomInput}
             />
           </View>
 
@@ -174,6 +177,9 @@ const styles = StyleSheet.create({
   inputContainer: {
     width: '100%',
     gap: 15,
+  },
+  inputContainerCustomInput: {
+    marginBottom: 15,
   },
   input: {
     // Los estilos del input se definen en el componente CustomInput.

@@ -5,8 +5,11 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  // 1. Se importan tipos para los estilos
+  StyleProp,
+  ViewStyle,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Asegúrate de instalar este paquete: npm install @expo/vector-icons
+import { Ionicons } from '@expo/vector-icons';
 
 interface CustomInputProps {
   label: string;
@@ -15,6 +18,8 @@ interface CustomInputProps {
   onChangeText: (text: string) => void;
   secureTextEntry?: boolean;
   keyboardType?: string;
+  // 2. Se añade la nueva propiedad opcional para los estilos del contenedor
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
 const CustomInput = ({
@@ -23,11 +28,15 @@ const CustomInput = ({
   value,
   onChangeText,
   secureTextEntry = false,
+  keyboardType,
+  // 3. Se recibe la nueva propiedad
+  containerStyle,
 }: CustomInputProps) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   return (
-    <View style={styles.container}>
+    // 4. Se aplica el estilo personalizado al View principal
+    <View style={[styles.container, containerStyle]}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.inputContainer}>
         <TextInput
@@ -58,7 +67,7 @@ const CustomInput = ({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginBottom: 15,
+    // 5. Se elimina el marginBottom fijo de aquí.
   },
   label: {
     fontSize: 14,
