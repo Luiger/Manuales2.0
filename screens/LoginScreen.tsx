@@ -12,6 +12,7 @@ import {
   Platform,
   Image
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Link, Href } from 'expo-router';
 import { AuthService } from '../src/services/auth.service'; // Importamos nuestro servicio
 import CustomInput from '../components/CustomInput';
@@ -73,7 +74,8 @@ const LoginScreen = () => {
 
   // --- Renderizado de la Interfaz (UI) ---
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
+   <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>    
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={styles.container}>
           {/* Logo */}
@@ -135,12 +137,17 @@ const LoginScreen = () => {
         </ScrollView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 // --- Estilos ---
 // Se utiliza StyleSheet para un mejor rendimiento y organización.
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
   container: {
     flexGrow: 1,
     justifyContent: 'center',

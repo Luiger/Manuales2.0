@@ -9,7 +9,7 @@ import * as SecureStore from 'expo-secure-store';
 // `API_URL`: La URL base de tu backend. Es una buena práctica tenerla en un
 // archivo de configuración, pero por ahora la definimos aquí.
 // Asegúrate de que el puerto coincida con el de tu backend.
-const API_URL = 'https://fa21355cc866.ngrok-free.app/api/auth'; // Ajustado al puerto 3000
+const API_URL = 'https://7c7f5b5c73d1.ngrok-free.app/api/auth'; // Ajustado al puerto 3000
 
 // --- Interfaces ---
 interface AuthResponse {
