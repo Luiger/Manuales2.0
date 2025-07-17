@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Alert, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Alert, ActivityIndicator, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { UserService } from '../src/services/user.service';
@@ -60,69 +60,81 @@ const EditProfileScreen = () => {
   };
   
   if (loading) {
-    return <View style={styles.centered}><ActivityIndicator size="large" /></View>;
+    return <View style={styles.centered}><ActivityIndicator size="large" color="#1E3A8A" /></View>;
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ChevronLeftIcon size={28} color="#1F2937" />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.contentContainer}>
-        <Text style={styles.title}>Editar Perfil</Text>
-        
-        <View style={styles.formWrapper}>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {/* Ahora se utiliza un estilo definido en la hoja de estilos */}
-                <CustomInput
-                    label="Nombre"
-                    placeholder="Ingrese su nombre"
-                    value={profileData.Nombre}
-                    onChangeText={(val) => handleInputChange('Nombre', val)}
-                    containerStyle={styles.inputContainer}
-                />
-                <CustomInput
-                    label="Apellido"
-                    placeholder="Ingrese su apellido"
-                    value={profileData.Apellido}
-                    onChangeText={(val) => handleInputChange('Apellido', val)}
-                    containerStyle={styles.inputContainer}
-                />
-                <CustomInput
-                    label="Teléfono"
-                    placeholder="Ingrese su teléfono"
-                    value={profileData.Telefono}
-                    onChangeText={(val) => handleInputChange('Telefono', val)}
-                    keyboardType="phone-pad"
-                    containerStyle={styles.inputContainer}
-                />
-                <CustomInput
-                    label="Institución"
-                    placeholder="Ingrese su institución"
-                    value={profileData.Institucion}
-                    onChangeText={(val) => handleInputChange('Institucion', val)}
-                    containerStyle={styles.inputContainer}
-                />
-                <CustomInput
-                    label="Cargo"
-                    placeholder="Ingrese su cargo"
-                    value={profileData.Cargo}
-                    onChangeText={(val) => handleInputChange('Cargo', val)}
-                    // El último no necesita el estilo de margen inferior
-                />
-            </ScrollView>
-        </View>
-
-        <View style={styles.footer}>
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
-          <TouchableOpacity style={styles.button} onPress={handleSaveChanges} disabled={isSaving}>
-            {isSaving ? <ActivityIndicator color="#FFF" /> : <Text style={styles.buttonText}>Guardar Cambios</Text>}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        {/* Header con solo la flecha */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <ChevronLeftIcon size={28} color="#1F2937" />
           </TouchableOpacity>
         </View>
-      </View>
+
+        {/* Contenedor principal para el título, formulario y footer */}
+        <View style={styles.contentContainer}>
+          <Text style={styles.title}>Editar Perfil</Text>
+          
+          {/* Wrapper para el formulario que permite el scroll */}
+          <ScrollView 
+            style={styles.formScrollView}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            <CustomInput
+              label="Nombre"
+              placeholder="Ingrese su nombre"
+              value={profileData.Nombre}
+              onChangeText={(val) => handleInputChange('Nombre', val)}
+              containerStyle={styles.inputContainer}
+            />
+            <CustomInput
+              label="Apellido"
+              placeholder="Ingrese su apellido"
+              value={profileData.Apellido}
+              onChangeText={(val) => handleInputChange('Apellido', val)}
+              containerStyle={styles.inputContainer}
+            />
+            <CustomInput
+              label="Teléfono"
+              placeholder="Ingrese su teléfono"
+              value={profileData.Telefono}
+              onChangeText={(val) => handleInputChange('Telefono', val)}
+              keyboardType="phone-pad"
+              containerStyle={styles.inputContainer}
+            />
+            <CustomInput
+              label="Institución"
+              placeholder="Ingrese su institución"
+              value={profileData.Institucion}
+              onChangeText={(val) => handleInputChange('Institucion', val)}
+              containerStyle={styles.inputContainer}
+            />
+            <CustomInput
+              label="Cargo"
+              placeholder="Ingrese su cargo"
+              value={profileData.Cargo}
+              onChangeText={(val) => handleInputChange('Cargo', val)}
+              containerStyle={styles.inputContainer}
+            />
+
+            
+          <View style={styles.footer}>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            <TouchableOpacity style={styles.button} onPress={handleSaveChanges} disabled={isSaving}>
+              {isSaving ? <ActivityIndicator color="#FFF" /> : <Text style={styles.buttonText}>Guardar Cambios</Text>}
+            </TouchableOpacity>
+          </View>
+          </ScrollView>
+
+          {/* Footer con el botón, se mantiene abajo */}
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -138,9 +150,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     height: 60,
   },
+  inputContainer: {
+    marginBottom: 34,
+  },
   backButton: {
     padding: 8,
   },
+  // ✅ Nuevo contenedor principal
   contentContainer: {
     flex: 1,
     paddingHorizontal: 20,
@@ -149,19 +165,23 @@ const styles = StyleSheet.create({
     fontSize: 24, 
     fontWeight: 'bold', 
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 15,
   },
-  formWrapper: {
-    flex: 1,
-    justifyContent: 'center',
+  // ✅ Nuevo estilo para el ScrollView del formulario
+  formScrollView: {
+    flex: 1, // Ocupa el espacio disponible
   },
-  // ✅ NUEVO: Estilo reutilizable para el espaciado de los inputs
-  inputContainer: {
-    marginBottom: 34,
+  centered: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB'
   },
-  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  // ✅ Footer corregido
   footer: {
-    paddingVertical: 20,
+    paddingTop: 20, // Espacio entre el formulario y el botón
+    paddingBottom: 10, // Menos espacio en la parte inferior
+    backgroundColor: '#F9FAFB',
   },
   button: { 
     width: '100%', 

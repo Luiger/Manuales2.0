@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const API_URL = 'https://c16f1fe83b2d.ngrok-free.app/api/user'; // URL base para la API de usuario
+const API_URL = 'https://e328e14e06c1.ngrok-free.app/api/user'; // URL base para la API de usuario
 
 // Define una interfaz para los datos del perfil que vienen del backend
 interface ProfileData {

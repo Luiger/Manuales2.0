@@ -13,10 +13,10 @@ const HomeScreen = () => {
     <View style={styles.container}>
       <View style={styles.row}>
         <Card
-          title="Manual 2 Sheet"
+          title="Manual Contrataciones"
           subtitle="Manual de Contrataciones Públicas"
           tag="#UniversitasLegal"
-          footerText="Manual 2 Sheet"
+          footerText="Manual Contrataciones"
           onPress={() => router.push('/manuales2')}
         />
         <Card
@@ -24,7 +24,13 @@ const HomeScreen = () => {
           subtitle="Manual de Contrataciones Públicas"
           tag="#UniversitasLegal"
           footerText="Manual Sheet"
-          onPress={() => router.push('/adquirir-pro' as any)}
+          onPress={() => router.push('/manuales2')}
+        />
+        <Card
+          title="Repositorio Universitas Legal"
+          subtitle="Conoce más de Universitas"
+          tag="#UniversitasLegal"
+          footerText="Repositorio Legal"
         />
         <Card
           title="Repositorio Universitas Legal"

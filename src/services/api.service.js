@@ -1,4 +1,4 @@
-const API_URL = 'https://c16f1fe83b2d.ngrok-free.app/api/form';
+const API_URL = 'https://e328e14e06c1.ngrok-free.app/api/form';
 
 const getFormQuestions = async () => {
   try {

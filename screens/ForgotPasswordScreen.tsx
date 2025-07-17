@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, Platform } from 'react-native';
+// 1. Se importan KeyboardAvoidingView y ScrollView de react-native
+import { View, Text, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Link } from 'expo-router';
 import { AuthService } from '../src/services/auth.service';
 import CustomInput from '../components/CustomInput';
 import Stepper from '../components/Stepper';
 import * as SecureStore from 'expo-secure-store';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { ChevronLeftIcon } from 'react-native-heroicons/outline';
+// Se elimina la importación de KeyboardAwareScrollView
 
 const ForgotPasswordScreen = () => {
     const router = useRouter();
@@ -168,76 +168,89 @@ const ForgotPasswordScreen = () => {
 
     const getSubtitle = () => {
         switch(step) {
-            case 1: return 'Ingresa el correo electrónico asociado a tu cuenta.';
-            case 2:
-    return (
-        <Text>
-            Hemos enviado un código a{'\n'}
-            <Text style={{ fontWeight: 'bold' }}>{email}</Text>
-        </Text>
-    );
-            case 3: return 'Tu nueva contraseña debe ser segura.';
-            default: return '';
+            case 1: 
+                return <Text style={styles.subtitle}>Ingresa el correo electrónico asociado a tu cuenta.</Text>;
+            case 2: 
+                return (
+                    <Text style={styles.subtitle}>
+                        Hemos enviado un código a{'\n'}
+                        <Text style={{fontWeight: 'bold'}}>{email}</Text>
+                    </Text>
+                );
+            case 3: 
+                return <Text style={styles.subtitle}>Tu nueva contraseña debe ser segura.</Text>;
+            default: 
+                return null;
         }
     };
 
     return (
         <SafeAreaView style={styles.container}>
-            {/* El header manual se ha eliminado */}
-            <KeyboardAwareScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={styles.scrollContainer}
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-                enableOnAndroid={true}
+            {/* 2. Se reemplaza KeyboardAwareScrollView por la combinación de KeyboardAvoidingView y ScrollView */}
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={styles.keyboardAvoidingContainer}
             >
-                <View style={styles.titleContainer}>
-                    <Text style={styles.mainTitle}>{getTitle()}</Text>
-                    <Text style={styles.subtitle}>{getSubtitle()}</Text>
-                </View>
+                <ScrollView
+                    contentContainerStyle={styles.scrollContainer}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.mainTitle}>{getTitle()}</Text>
+                        {getSubtitle()}
+                    </View>
 
-                <View style={styles.stepperWrapper}>
-                    <Stepper steps={steps} currentStep={step} />
-                </View>
+                    <View style={styles.stepperWrapper}>
+                        <Stepper steps={steps} currentStep={step} />
+                    </View>
 
-                {renderStepContent()}
-            </KeyboardAwareScrollView>
+                    {renderStepContent()}
+                </ScrollView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F9FAFB' },
-  // Los estilos 'header' y 'backButton' se han eliminado
+  container: { 
+    flex: 1, 
+    backgroundColor: '#F9FAFB',
+    paddingTop: 60,
+  },
+  // 3. Estilos para los nuevos componentes de layout
+  keyboardAvoidingContainer: {
+    flex: 1,
+  },
+  inputContainer: {
+    marginBottom: 15,
+  },
   scrollContainer: {
     flexGrow: 1,
     paddingHorizontal: 20,
-    paddingBottom: 40, 
+    paddingBottom: 40,
   },
   titleContainer: {
-    paddingTop: 10,
+    // No necesita cambios
   },
   mainTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  inputContainer: {
-    marginBottom: 15,
-  },
   subtitle: {
     fontSize: 16,
     color: '#6B7280',
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: 8,
     marginBottom: 10,
   },
   stepperWrapper: {
-    paddingHorizontal: '2%',
+    paddingHorizontal: '5%',
     marginBottom: 20,
   },
   formContainer: {
-    // Ya no necesita padding, el scrollContainer lo maneja
+    // No necesita cambios
   },
   button: { width: '100%', height: 50, backgroundColor: '#1E3A8A', borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginTop: 20 },
   buttonText: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },

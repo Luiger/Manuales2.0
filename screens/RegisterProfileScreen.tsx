@@ -7,14 +7,14 @@ import {
   ActivityIndicator,
   Platform,
   Alert,
+  KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, Href, Link } from 'expo-router';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { AuthService } from '../src/services/auth.service';
 import Stepper from '../components/Stepper';
 import CustomInput from '../components/CustomInput';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import * as SecureStore from 'expo-secure-store';
 
 const RegisterProfileScreen = () => {
@@ -25,12 +25,9 @@ const RegisterProfileScreen = () => {
     Telefono: '',
     Institucion: '',
     Cargo: ''
-    //Genero: '',
-    //FechaNacimiento: new Date(),
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const steps = [
     { title: 'Credenciales' },
@@ -47,19 +44,11 @@ const RegisterProfileScreen = () => {
     setProfile(prevState => ({ ...prevState, [name]: value }));
   };
 
-  /*const handleDateChange = (event: any, selectedDate: Date | undefined) => {
-    const currentDate = selectedDate || profile.FechaNacimiento;
-    setShowDatePicker(Platform.OS === 'ios');
-    setProfile(prevState => ({ ...prevState, FechaNacimiento: currentDate }));
-  };*/
-
   const handleCompleteProfile = async () => {
-    // 2. Se añade la validación al presionar el botón como doble seguridad.
     if (!isFormValid) {
       setError('Todos los campos son obligatorios.');
       return;
     }
-    // 3. Se limpia el error antes de iniciar la carga.
     setError('');
     setLoading(true);
     const tempToken = await SecureStore.getItemAsync('tempRegToken');
@@ -86,81 +75,79 @@ const RegisterProfileScreen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <KeyboardAwareScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={styles.scrollContainer}
-        resetScrollToCoords={{ x: 0, y: 0 }}
-        scrollEnabled={true}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        enableOnAndroid={true}
-        extraScrollHeight={40}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoidingContainer}
       >
-        <View style={styles.mainContent}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Completa tus datos</Text>
-            <Text style={styles.subtitle}>Por favor, introduce tus datos personales</Text>
-            <Stepper steps={steps} currentStep={2} />
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.mainContent}>
+            <View style={styles.header}>
+              <Text style={styles.title}>Completa tus datos</Text>
+              <Text style={styles.subtitle}>Por favor, introduce tus datos personales</Text>
+              <Stepper steps={steps} currentStep={2} />
+            </View>
+            <View style={styles.formContainer}>
+              <CustomInput
+                label="Nombre"
+                placeholder="Ingresa tu nombre"
+                value={profile.Nombre}
+                onChangeText={(val) => handleInputChange('Nombre', val)}
+                containerStyle={styles.inputContainer}
+              />
+              <CustomInput
+                label="Apellido"
+                placeholder="Ingresa tu apellido"
+                value={profile.Apellido}
+                onChangeText={(val) => handleInputChange('Apellido', val)}
+                containerStyle={styles.inputContainer}
+              />
+              <CustomInput
+                label="Teléfono"
+                placeholder="Ingresa tu número"
+                value={profile.Telefono}
+                onChangeText={(val) => handleInputChange('Telefono', val)}
+                keyboardType="phone-pad"
+                containerStyle={styles.inputContainer}
+              />
+              <CustomInput
+                label="Institución"
+                placeholder="Ingresa tu institución"
+                value={profile.Institucion}
+                onChangeText={(val) => handleInputChange('Institucion', val)}
+                containerStyle={styles.inputContainer}
+              />
+              <CustomInput
+                label="Cargo"
+                placeholder="Ingresa tu cargo"
+                value={profile.Cargo}
+                onChangeText={(val) => handleInputChange('Cargo', val)}
+                containerStyle={styles.inputContainer}
+              />
+            </View>
           </View>
-          <View style={styles.formContainer}>
-            <CustomInput
-              label="Nombre"
-              placeholder="Ingresa tu nombre"
-              value={profile.Nombre}
-              onChangeText={(val) => handleInputChange('Nombre', val)}
-              containerStyle={styles.inputContainer}
-            />
-            <CustomInput
-              label="Apellido"
-              placeholder="Ingresa tu apellido"
-              value={profile.Apellido}
-              onChangeText={(val) => handleInputChange('Apellido', val)}
-              containerStyle={styles.inputContainer}
-            />
-            <CustomInput
-              label="Teléfono"
-              placeholder="Ingresa tu número"
-              value={profile.Telefono}
-              onChangeText={(val) => handleInputChange('Telefono', val)}
-              keyboardType="phone-pad"
-              containerStyle={styles.inputContainer}
-            />
-            <CustomInput
-              label="Institución"
-              placeholder="Ingresa tu institución"
-              value={profile.Institucion}
-              onChangeText={(val) => handleInputChange('Institucion', val)}
-              containerStyle={styles.inputContainer}
-            />
-            <CustomInput
-              label="Cargo"
-              placeholder="Ingresa tu cargo"
-              value={profile.Cargo}
-              onChangeText={(val) => handleInputChange('Cargo', val)}
-              containerStyle={styles.inputContainer}
-            />
-          </View>
-        </View>
 
-        <View style={styles.footer}>
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
-          {/* 3. Se deshabilita el botón si el formulario no es válido o está cargando. */}
-          {/* También se le aplica un estilo diferente. */}
-          <TouchableOpacity
-            style={[styles.button, !isFormValid && styles.buttonDisabled]}
-            onPress={handleCompleteProfile}
-            disabled={!isFormValid || loading}
-          >
-            {loading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>Crear cuenta</Text>}
-          </TouchableOpacity>
-          <View style={styles.loginLinkContainer}>
-            <Text>¿Ya tienes una cuenta? </Text>
-            <Link href="/login" style={styles.loginLink}>
-              Inicia sesión
-            </Link>
+          <View style={styles.footer}>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            <TouchableOpacity
+              style={[styles.button, !isFormValid && styles.buttonDisabled]}
+              onPress={handleCompleteProfile}
+              disabled={!isFormValid || loading}
+            >
+              {loading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>Crear cuenta</Text>}
+            </TouchableOpacity>
+            <View style={styles.loginLinkContainer}>
+              <Text>¿Ya tienes una cuenta? </Text>
+              <Link href="/login" style={styles.loginLink}>
+                Inicia sesión
+              </Link>
+            </View>
           </View>
-        </View>
-      </KeyboardAwareScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -170,14 +157,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9FAFB',
   },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 15,
-    paddingBottom: 25,
+  keyboardAvoidingContainer: {
+    flex: 1,
   },
-  // 4. Nuevo estilo para el botón cuando está deshabilitado.
+  scrollContainer: {
+    padding: 20,
+    paddingBottom: 50,
+  },
   buttonDisabled: {
     backgroundColor: '#9CA3AF',
   },
@@ -187,9 +173,6 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 20,
-  },
-  inputContainer: {
-    marginBottom: 15,
   },
   title: {
     fontSize: 22,
@@ -223,6 +206,9 @@ const styles = StyleSheet.create({
     color: '#EF4444',
     textAlign: 'center',
     marginBottom: 10,
+  },
+  inputContainer: {
+    marginBottom: 15,
   },
   loginLinkContainer: {
     marginTop: 20,

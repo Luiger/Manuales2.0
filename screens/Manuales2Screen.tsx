@@ -6,10 +6,14 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  // 1. Se importan los componentes nativos
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+// Se elimina la importación de KeyboardAwareScrollView
 import CustomInput from '../components/CustomInput';
 import { FormService } from '../src/services/form.service';
 
@@ -126,88 +130,72 @@ const Manuales2Screen = () => {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
-      <KeyboardAwareScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={styles.scrollContainer}
-        resetScrollToCoords={{ x: 0, y: 0 }}
-        scrollEnabled={true}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        enableOnAndroid={true}
-        extraScrollHeight={40}
+      {/* 2. Se reemplaza KeyboardAwareScrollView por la combinación nativa */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoidingContainer}
       >
-        <View style={styles.innerContainer}>
-          <View>
-            <View style={styles.formContainer}>
-               <CustomInput
-                label="Dirección de correo electrónico"
-                placeholder="correo@institucion.com"
-                value={formData.emailPrincipal}
-                onChangeText={(val) => handleInputChange('emailPrincipal', val)}
-                keyboardType="email-address"
-                containerStyle={styles.inputContainer}
-              />
-              <CustomInput
-                label="Nombre de la Institución / Ente / Órgano"
-                placeholder="Ingrese el nombre completo"
-                value={formData.nombreInstitucion}
-                onChangeText={(val) => handleInputChange('nombreInstitucion', val)}
-                containerStyle={styles.inputContainer}
-              />
-              <CustomInput
-                label="Acrónimo / Siglas de la Institución"
-                placeholder="Ej: MOPC"
-                value={formData.siglasInstitucion}
-                onChangeText={(val) => handleInputChange('siglasInstitucion', val)}
-                containerStyle={styles.inputContainer}
-              />
-              <CustomInput
-                label="Unidad Responsable (Gestión Adm. y Fin.)"
-                placeholder="Ingrese la unidad de gestión"
-                value={formData.unidadGestion}
-                onChangeText={(val) => handleInputChange('unidadGestion', val)}
-                containerStyle={styles.inputContainer}
-              />
-              <CustomInput
-                label="Unidad Responsable (Sistemas y Tec.)"
-                placeholder="Ingrese la unidad de tecnología"
-                value={formData.unidadSistemas}
-                onChangeText={(val) => handleInputChange('unidadSistemas', val)}
-                containerStyle={styles.inputContainer}
-              />
-              <CustomInput
-                label="Unidad Contratante"
-                placeholder="Ingrese la unidad contratante"
-                value={formData.unidadContratante}
-                onChangeText={(val) => handleInputChange('unidadContratante', val)}
-                containerStyle={styles.inputContainer}
-              />
-              <CustomInput
-                label="Persona de contacto"
-                placeholder="Nombre y Apellido"
-                value={formData.personaContacto}
-                onChangeText={(val) => handleInputChange('personaContacto', val)}
-                containerStyle={styles.inputContainer}
-              />
-              <CustomInput
-                label="Teléfono"
-                placeholder="Ingrese el número de teléfono"
-                value={formData.telefono}
-                onChangeText={(val) => handleInputChange('telefono', val)}
-                keyboardType="phone-pad"
-                containerStyle={styles.inputContainer}
-              />
-              <CustomInput
-                label="Correo electrónico de contacto"
-                placeholder="correo.contacto@dominio.com"
-                value={formData.emailContacto}
-                onChangeText={(val) => handleInputChange('emailContacto', val)}
-                keyboardType="email-address"
-                containerStyle={styles.inputContainer}
-              />
-            </View>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Contenido principal que se expandirá */}
+          <View style={styles.mainContent}>
+            <CustomInput
+              label="Dirección de correo electrónico"
+              placeholder="correo@institucion.com"
+              value={formData.emailPrincipal}
+              onChangeText={(val) => handleInputChange('emailPrincipal', val)}
+              keyboardType="email-address"
+              containerStyle={styles.inputContainer}
+            />
+            <CustomInput
+              label="Nombre de la Institución / Ente / Órgano"
+              placeholder="Ingrese el nombre completo"
+              value={formData.nombreInstitucion}
+              onChangeText={(val) => handleInputChange('nombreInstitucion', val)}
+              containerStyle={styles.inputContainer}
+            />
+            <CustomInput
+              label="Acrónimo / Siglas de la Institución"
+              placeholder="Ej: MOPC"
+              value={formData.siglasInstitucion}
+              onChangeText={(val) => handleInputChange('siglasInstitucion', val)}
+              containerStyle={styles.inputContainer}
+            />
+            <CustomInput
+              label="Unidad Responsable (Gestión Adm. y Fin.)"
+              placeholder="Ingrese la unidad de gestión"
+              value={formData.unidadGestion}
+              onChangeText={(val) => handleInputChange('unidadGestion', val)}
+              containerStyle={styles.inputContainer}
+            />
+            <CustomInput
+              label="Unidad Responsable (Sistemas y Tec.)"
+              placeholder="Ingrese la unidad de tecnología"
+              value={formData.unidadSistemas}
+              onChangeText={(val) => handleInputChange('unidadSistemas', val)}
+              containerStyle={styles.inputContainer}
+            />
+            <CustomInput
+              label="Unidad Contratante"
+              placeholder="Ingrese la unidad contratante"
+              value={formData.unidadContratante}
+              onChangeText={(val) => handleInputChange('unidadContratante', val)}
+              containerStyle={styles.inputContainer}
+            />
+            <CustomInput
+              label="Correo electrónico de contacto"
+              placeholder="correo.contacto@dominio.com"
+              value={formData.emailContacto}
+              onChangeText={(val) => handleInputChange('emailContacto', val)}
+              keyboardType="email-address"
+              containerStyle={styles.inputContainer}
+            />
           </View>
 
+          {/* Footer con el botón */}
           <View style={styles.footer}>
             {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <TouchableOpacity
@@ -218,8 +206,8 @@ const Manuales2Screen = () => {
               {loading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>Enviar Formulario</Text>}
             </TouchableOpacity>
           </View>
-        </View>
-      </KeyboardAwareScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -229,14 +217,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9FAFB',
   },
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  innerContainer: {
+  keyboardAvoidingContainer: {
     flex: 1,
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 25,
+  },
+  scrollContainer: {
+    padding: 20,
+    paddingBottom: 50,    
+  },
+  mainContent: {
+    flex: 1, // Hace que esta sección ocupe el espacio disponible
   },
   loadingContainer: {
     flex: 1,
@@ -244,13 +233,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F9FAFB',
   },
-  formContainer: {
-  },
   footer: {
-    paddingTop: 24,
-  },
-  inputContainer: {
-    marginBottom: 15,
+    paddingTop: 10, // Espacio entre el último input y el botón
   },
   button: {
     width: '100%',
@@ -259,6 +243,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 10,
   },
   buttonDisabled: {
     backgroundColor: '#9CA3AF',
@@ -267,6 +252,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  inputContainer: {
+    marginBottom: 15,
   },
   errorText: {
     color: '#EF4444',

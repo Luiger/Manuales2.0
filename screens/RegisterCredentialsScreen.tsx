@@ -6,6 +6,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   Platform,
+  KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
 import { useRouter, Href, Link } from 'expo-router';
 import { AuthService } from '../src/services/auth.service';
@@ -13,8 +15,6 @@ import * as SecureStore from 'expo-secure-store';
 import Stepper from '../components/Stepper';
 import CustomInput from '../components/CustomInput';
 import { validateEmail, validatePassword } from '../src/utils/validators';
-// 1. Se importa KeyboardAwareScrollView y se eliminan los otros componentes de scroll
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const RegisterCredentialsScreen = () => {
@@ -68,64 +68,67 @@ const RegisterCredentialsScreen = () => {
   };
 
   return (
-    // 2. Se reemplaza KeyboardAvoidingView por SafeAreaView
     <SafeAreaView style={styles.safeArea}>
-        {/* 3. Se usa KeyboardAwareScrollView para envolver todo el contenido */}
-        <KeyboardAwareScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={styles.container}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            enableOnAndroid={true}
-            extraScrollHeight={20}
+      <KeyboardAvoidingView
+        // 'padding' suele ser más fiable en iOS. En Android, el comportamiento por defecto (adjustResize) suele ser suficiente.
+        behavior={Platform.OS === 'ios' ? 'padding' : "height"}
+        style={styles.keyboardAvoidingContainer}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
+          {/* Contenedor para el contenido principal que se expandirá */}
+          <View style={styles.mainContent}>
             <View style={styles.header}>
-                <Text style={styles.title}>Crea tu cuenta</Text>
-                <Text style={styles.subtitle}>Por favor, introduce tus datos para iniciar sesión</Text>
-                <Stepper steps={steps} currentStep={1} />
+              <Text style={styles.title}>Crea tu cuenta</Text>
+              <Text style={styles.subtitle}>Por favor, introduce tus datos para iniciar sesión</Text>
+              <Stepper steps={steps} currentStep={1} />
             </View>
-
             <View style={styles.formContainer}>
-                <CustomInput
-                    label="Correo electrónico"
-                    placeholder="Ingresa tu correo"
-                    value={email}
-                    onChangeText={setEmail}
-                    autoCapitalize="none"
-                    containerStyle={styles.inputContainer}
-                />
-                <CustomInput
-                    label="Contraseña"
-                    placeholder="Ingresa tu contraseña"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                    containerStyle={styles.inputContainer}
-                />
-                <CustomInput
-                    label="Confirmar Contraseña"
-                    placeholder="Repite tu contraseña"
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                    secureTextEntry
-                    containerStyle={styles.inputContainer}
-                />
+              <CustomInput
+                label="Correo electrónico"
+                placeholder="Ingresa tu correo"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                containerStyle={styles.inputContainer}
+              />
+              <CustomInput
+                label="Contraseña"
+                placeholder="Ingresa tu contraseña"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                containerStyle={styles.inputContainer}
+              />
+              <CustomInput
+                label="Confirmar Contraseña"
+                placeholder="Repite tu contraseña"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
+                containerStyle={styles.inputContainer}
+              />
             </View>
-
-            {/* Se agrupa el contenido inferior para un mejor manejo del layout */}
-            <View style={styles.footer}>
-                {error ? <Text style={styles.errorText}>{error}</Text> : null}
-                <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
-                    {loading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>Siguiente</Text>}
-                </TouchableOpacity>
-                <View style={styles.loginLinkContainer}>
-                    <Text>¿Ya tienes una cuenta? </Text>
-                    <Link href="/login" style={styles.loginLink}>
-                    Inicia sesión
-                    </Link>
-                </View>
+          </View>
+          
+          {/* Contenedor para el footer con los botones */}
+          <View style={styles.footer}>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+            <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
+              {loading ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.buttonText}>Siguiente</Text>}
+            </TouchableOpacity>
+            <View style={styles.loginLinkContainer}>
+              <Text>¿Ya tienes una cuenta? </Text>
+              <Link href="/login" style={styles.loginLink}>
+                Inicia sesión
+              </Link>
             </View>
-        </KeyboardAwareScrollView>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -135,13 +138,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9FAFB',
   },
-  container: {
-    flexGrow: 1,
-    padding: 20,// Asegura que el footer quede abajo
+  keyboardAvoidingContainer: {
+    flex: 1,
+  },
+  scrollContainer: {
+    padding: 20,
+    paddingBottom: 50,
+  },
+  // ✅ Nuevo estilo para el contenido principal
+  mainContent: {
+   // flex: 1, // Hace que esta sección ocupe todo el espacio disponible, empujando el footer hacia abajo.
   },
   header: {
     marginBottom: 20,
-    
   },
   title: {
     fontSize: 24,
@@ -160,7 +169,7 @@ const styles = StyleSheet.create({
     // No necesita estilos complejos
   },
   footer: {
-    paddingTop: 10,
+    paddingTop: 10, // Espacio entre el último input y el botón
   },
   inputContainer: {
     marginBottom: 15,

@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.luiger.ManualesdeContrataciones"      
     },
     "web": {
       "bundler": "metro",
@@ -41,6 +42,12 @@
     "experiments": {
       "typedRoutes": true
     },
-    "scheme": "manuales-de-contrataciones"
+    "scheme": "manuales-de-contrataciones",
+    "extra": {
+      "router": {},
+      "eas": {
+      }
+    },
+    "owner": "luiger"
   }
 }

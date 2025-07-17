@@ -6,7 +6,7 @@ import * as SecureStore from 'expo-secure-store';
 // en lo que respecta a la autenticación.
 
 // --- Constantes ---
-const API_URL = 'https://c16f1fe83b2d.ngrok-free.app/api/auth';
+const API_URL = 'https://e328e14e06c1.ngrok-free.app/api/auth';
 
 // --- Interfaces ---
 interface AuthResponse {
