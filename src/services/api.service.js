@@ -1,13 +1,17 @@
-const API_URL = 'https://e328e14e06c1.ngrok-free.app/api/form';
+const API_URL = process.env.API_URL;
 
 const getFormQuestions = async () => {
   try {
     const response = await fetch(`${API_URL}/questions`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Error fetching form questions' }));
+      return { success: false, error: errorData };
+    }
     const data = await response.json();
-    return data.questions;
+    return { success: true, questions: data.questions };
   } catch (error) {
     console.error('Error fetching form questions:', error);
-    return null;
+    return { success: false, error: { message: error.message } };
   }
 };
 
@@ -21,14 +25,14 @@ const submitFormAnswers = async (answers) => {
       body: JSON.stringify({ answers }),
     });
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({ message: 'Error submitting form answers' }));
       console.error('Error submitting form answers:', errorData);
-      return false;
+      return { success: false, error: errorData };
     }
-    return true;
+    return { success: true };
   } catch (error) {
     console.error('Error submitting form answers:', error);
-    return false;
+    return { success: false, error: { message: error.message } };
   }
 };
 

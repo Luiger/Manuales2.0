@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const API_URL = 'https://e328e14e06c1.ngrok-free.app/api/manuales';
+const API_URL = `${process.env.API_URL}/manuales`;
 
 interface FormSubmitResponse {
   success: boolean;
