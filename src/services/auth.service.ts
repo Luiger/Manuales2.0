@@ -6,7 +6,7 @@ import * as SecureStore from 'expo-secure-store';
 // en lo que respecta a la autenticación.
 
 // --- Constantes ---
-const API_URL = `${process.env.API_URL}/auth`;
+const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/api/auth`;
 
 // --- Interfaces ---
 interface AuthResponse {

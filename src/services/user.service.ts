@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-const API_URL = `${process.env.API_URL}/user`; // URL base para la API de usuario
+const API_URL = `${process.env.EXPO_PUBLIC_API_URL}/api/user`; // URL base para la API de usuario
 
 // Define una interfaz para los datos del perfil que vienen del backend
 interface ProfileData {
