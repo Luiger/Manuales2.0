@@ -1,35 +1,43 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-// 1. Importa el GestureHandlerRootView
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import '../global.css';
+import { useAuth } from '../src/hooks/useAuth';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
   useEffect(() => {
-    SplashScreen.hideAsync();
-  }, []);
+    if (!isLoading) {
+      SplashScreen.hideAsync();
+      const inAuthGroup = segments[0] === '(auth)';
+      if (isAuthenticated && !inAuthGroup) {
+        router.replace('/(tabs)/home');
+      } else if (!isAuthenticated) {
+        router.replace('/(auth)/login');
+      }
+    }
+  }, [isLoading, isAuthenticated, segments]);
+
+  if (isLoading) {
+    return null; // o un componente de carga
+  }
 
   return (
-    // 2. Envuelve TODO con GestureHandlerRootView. El estilo flex: 1 es crucial.
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
-          
-          {/* Carpeta Tabs */}
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
-          {/* Carpeta Profile */}
           <Stack.Screen name="(profile)" options={{ headerShown: false }} />
-          {/* Carpeta Auth */}
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          {/* Interfaz de Manual de Contrataciones */}
           <Stack.Screen name="manuales2" options={{ title: 'Manual de Contrataciones' }} />
-
         </Stack>
       </SafeAreaProvider>
     </GestureHandlerRootView>

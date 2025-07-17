@@ -6,7 +6,7 @@ import * as SecureStore from 'expo-secure-store';
 // en lo que respecta a la autenticación.
 
 // --- Constantes ---
-const API_URL = 'https://c16f1fe83b2d.ngrok-free.app/api/auth';
+const API_URL = `${process.env.API_URL}/auth`;
 
 // --- Interfaces ---
 interface AuthResponse {
@@ -134,10 +134,6 @@ const logout = async (): Promise<void> => {
   try {
     // Elimina el token de usuario que mantiene la sesión activa.
     await SecureStore.deleteItemAsync('userToken');
-    
-    // También es buena práctica limpiar otros tokens temporales si existen.
-    await SecureStore.deleteItemAsync('resetToken');
-    await SecureStore.deleteItemAsync('tempRegToken');
   } catch (error) {
     console.error('Error durante el logout en el servicio:', error);
     // No es necesario lanzar un error aquí, el objetivo es desloguear al usuario.
