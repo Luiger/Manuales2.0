@@ -21,7 +21,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.luiger.ManualesdeContrataciones"      
+      "package": "com.luiger.ManualesdeContrataciones"
     },
     "web": {
       "bundler": "metro",
@@ -46,6 +46,7 @@
     "extra": {
       "router": {},
       "eas": {
+        "projectId": "8d6e0aa9-2702-4a08-b2bc-03100cbb9540"
       }
     },
     "owner": "luiger"
